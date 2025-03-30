@@ -58,17 +58,8 @@ if not args.profile_path:
 else:
     profile_path = args.profile_path
 
-if not args.url:
-    url = os.getenv("COLAB_URL", "")
-    if not url:
-        if args.interactive:
-            print("Set the COLAB_URL environment variable to avoid entering the url every time")
-            url = input("Enter the url: ")
-        else:
-            print(input_err_msg.format("--url"))
-            sys.exit()
-else:
-    url = args.url
+# 🔥🔥 Your Colab link is hardcoded below
+url = "https://colab.research.google.com/drive/14-5AoRkSj7OSxL_b9LSNRd-7vXE_3Oj-?usp=sharing"
 
 if not args.cells_to_execute:
     cells_to_execute = os.getenv("COLAB_CELLS", "")
@@ -86,14 +77,12 @@ execute_cell_button_xpath = "//div[@id='{}']//paper-icon-button[contains(@title,
 cell_xpath = "//div[@id='{}']"
 cell_content_xpath = "//div[@id='{}']//*[contains(@class,'editor-scrollable')]"
 cell_spinner_xpath = "//div[@id='{}']//*[@class='cell-spinner']"
-# ok_button_xpath = "//*[@id='ok']"
 ok_button_js = """document.getElementById("ok").click()"""
 get_all_cells_js = """ret_values = []
 for(let i = 0; i < colab.global.notebook.cells_.length; ++i) {
     ret_values.push(colab.global.notebook.cells_[i].element_.id)
 }
 return ret_values"""
-
 
 driver = webdriver.Firefox(firefox_profile=profile_path)
 try:
@@ -115,7 +104,7 @@ try:
             print("Cell ID:", cell)
             print("Cell Content:")
             print(cell_content[:100], "...")
-            print("*"*shutil.get_terminal_size().columns)
+            print("*" * shutil.get_terminal_size().columns)
         driver.close()
         sys.exit()
 
@@ -141,7 +130,6 @@ try:
                 if cell_spinners:
                     cell_spinner = cell_spinners[0]
                     cell_spinner_display = cell_spinner.value_of_css_property("display")
-                    # print("Cell spinner display:", cell_spinner_display)
                     if str(cell_spinner_display).lower() != "none":
                         continue
                 for cell_ex_element, cell_element in zip(cell_execute_elements, cell_elements):
@@ -168,4 +156,3 @@ finally:
         driver.close()
     except Exception:
         print("Exiting")
-
